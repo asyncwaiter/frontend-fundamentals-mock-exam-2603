@@ -1,7 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { createReservation } from 'pages/remotes';
+import { useCreateReservation as useCreateReservationMutation } from 'domains/reservation/hooks/useReservations';
 
 interface CreateReservationParams {
   roomId: string;
@@ -12,23 +11,13 @@ interface CreateReservationParams {
   equipment: string[];
 }
 
-interface UseCreateReservationOptions {
+interface UseBookingOptions {
   onError: (message: string) => void;
 }
 
-export function useCreateReservation({ onError }: UseCreateReservationOptions) {
-  const queryClient = useQueryClient();
+export function useBooking({ onError }: UseBookingOptions) {
   const navigate = useNavigate();
-
-  const mutation = useMutation(
-    (data: CreateReservationParams) => createReservation(data),
-    {
-      onSuccess: (_data, variables) => {
-        queryClient.invalidateQueries(['reservations', variables.date]);
-        queryClient.invalidateQueries(['myReservations']);
-      },
-    }
-  );
+  const mutation = useCreateReservationMutation();
 
   const handleBook = async (params: CreateReservationParams) => {
     try {

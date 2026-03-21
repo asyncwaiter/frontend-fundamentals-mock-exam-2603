@@ -5,7 +5,7 @@ import { Top, Spacing, Border, Text } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import type { Equipment } from 'domains/reservation/types';
 import { useBookingForm, type BookingFormState } from './hooks/useBookingForm';
-import { useCreateReservation } from './hooks/useCreateReservation';
+import { useBooking } from './hooks/useCreateReservation';
 import { BookingFilters } from './components/BookingFilters';
 import { RoomList } from './components/RoomList';
 
@@ -50,7 +50,7 @@ export function RoomBookingPage() {
     setSearchParams(params, { replace: true });
   }, [form.date, form.startTime, form.endTime, form.attendees, form.equipment, form.preferredFloor, setSearchParams]);
 
-  const { book, isLoading } = useCreateReservation({
+  const { book, isLoading } = useBooking({
     onError: (message) => {
       form.setError(message);
       form.selectRoom(null);
