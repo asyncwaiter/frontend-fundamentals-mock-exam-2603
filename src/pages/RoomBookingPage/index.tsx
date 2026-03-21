@@ -1,11 +1,14 @@
 import { css } from '@emotion/react';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Top, Spacing, Border, Text } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import type { Equipment } from 'domains/reservation/types';
+import { useRooms } from 'domains/reservation/hooks/useRooms';
+import { useReservations } from 'domains/reservation/hooks/useReservations';
 import { useBookingForm, type BookingFormState } from './hooks/useBookingForm';
-import { useBooking } from './hooks/useCreateReservation';
+import { useBooking } from './hooks/useBooking';
+import { filterAvailableRooms } from './filters';
 import { BookingFilters } from './components/BookingFilters';
 import { RoomList } from './components/RoomList';
 
@@ -36,8 +39,18 @@ function parseBookingParams(searchParams: URLSearchParams): Partial<BookingFormS
 export function RoomBookingPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [error, setError] = useState<string | null>(null);
 
   const form = useBookingForm(parseBookingParams(searchParams));
+
+  const { data: rooms = [] } = useRooms();
+  const { data: reservations = [] } = useReservations(form.date);
+
+  // 층 선택지: rooms에서 파생
+  const floors = [...new Set(rooms.map(r => r.floor))].sort((a, b) => a - b);
+  const availableRooms = form.isFilterComplete
+    ? filterAvailableRooms(rooms, reservations, { date: form.date, startTime: form.startTime, endTime: form.endTime, attendees: form.attendees, equipment: form.equipment, preferredFloor: form.preferredFloor })
+    : [];
 
   useEffect(() => {
     const params: Record<string, string> = {};
@@ -52,17 +65,18 @@ export function RoomBookingPage() {
 
   const { book, isLoading } = useBooking({
     onError: (message) => {
-      form.setError(message);
+      setError(message);
       form.selectRoom(null);
     },
   });
 
   const handleBook = () => {
     if (!form.selectedRoomId) {
-      form.setError('회의실을 선택해주세요.');
+      setError('회의실을 선택해주세요.');
       return;
     }
 
+    setError(null);
     book({
       roomId: form.selectedRoomId,
       date: form.date,
@@ -92,7 +106,7 @@ export function RoomBookingPage() {
         예약하기
       </Top.Top03>
 
-      {form.errorMessage && (
+      {error && (
         <div css={css`padding: 0 24px;`}>
           <Spacing size={12} />
           <div
@@ -101,14 +115,14 @@ export function RoomBookingPage() {
               display: flex; align-items: center; gap: 8px;
             `}
           >
-            <Text typography="t7" fontWeight="medium" color={colors.red500}>{form.errorMessage}</Text>
+            <Text typography="t7" fontWeight="medium" color={colors.red500}>{error}</Text>
           </div>
         </div>
       )}
 
       <Spacing size={24} />
 
-      <BookingFilters form={form} />
+      <BookingFilters form={form} floors={floors} />
 
       {form.validationError && (
         <div css={css`padding: 0 24px;`}>
@@ -123,7 +137,7 @@ export function RoomBookingPage() {
 
       {form.isFilterComplete && (
         <RoomList
-          rooms={form.availableRooms}
+          rooms={availableRooms}
           selectedRoomId={form.selectedRoomId}
           onSelect={form.selectRoom}
           onBook={handleBook}

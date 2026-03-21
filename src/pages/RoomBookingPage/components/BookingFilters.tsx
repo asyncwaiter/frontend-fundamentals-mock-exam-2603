@@ -9,9 +9,10 @@ type BookingForm = ReturnType<typeof useBookingForm>;
 
 interface Props {
   form: BookingForm;
+  floors: number[];
 }
 
-export function BookingFilters({ form }: Props) {
+export function BookingFilters({ form, floors }: Props) {
   return (
     <div css={css`padding: 0 24px;`}>
       <Text typography="t5" fontWeight="bold" color={colors.grey900}>
@@ -88,7 +89,7 @@ export function BookingFilters({ form }: Props) {
             aria-label="선호 층"
           >
             <option value="">전체</option>
-            {form.floors.map((f: number) => (
+            {floors.map((f: number) => (
               <option key={f} value={f}>{f}층</option>
             ))}
           </Select>
