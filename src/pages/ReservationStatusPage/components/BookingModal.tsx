@@ -2,12 +2,12 @@ import { css } from '@emotion/react';
 import { useState } from 'react';
 import { Spacing, Text, Button, Select } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
-import { ALL_EQUIPMENT, EQUIPMENT_LABELS } from 'domains/reservation/constants';
-import { filterAvailableRooms } from 'domains/reservation/filters';
-import { useRooms } from 'domains/reservation/hooks/useRooms';
-import { useReservations } from 'domains/reservation/hooks/useReservations';
+import { ALL_EQUIPMENT, EQUIPMENT_LABELS } from 'constants/reservation';
+import { filterAvailableRooms } from 'utils/reservationFilters';
+import { useRooms } from 'hooks/useRooms';
+import { useReservations } from 'hooks/useReservations';
 import { useBooking } from 'pages/RoomBookingPage/hooks/useBooking';
-import type { Equipment } from 'domains/reservation/types';
+import type { Equipment } from 'models/reservation';
 
 interface Props {
   roomId: string;

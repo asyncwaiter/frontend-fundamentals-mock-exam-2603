@@ -1,9 +1,9 @@
 import { css } from '@emotion/react';
 import { Text } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
-import { EQUIPMENT_LABELS, TOTAL_MINUTES, TIME_SLOTS } from 'domains/reservation/constants';
-import { timeToMinutes } from 'domains/reservation/utils';
-import type { Room, Reservation } from 'domains/reservation/types';
+import { EQUIPMENT_LABELS, TOTAL_MINUTES, TIME_SLOTS } from 'constants/reservation';
+import { timeToMinutes } from 'utils/reservation';
+import type { Room, Reservation } from 'models/reservation';
 
 interface TimelineSelection {
   roomId: string;

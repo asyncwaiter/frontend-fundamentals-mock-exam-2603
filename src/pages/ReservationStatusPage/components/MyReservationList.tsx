@@ -1,8 +1,8 @@
 import { css } from '@emotion/react';
 import { Spacing, Text, Button, ListRow } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
-import { EQUIPMENT_LABELS } from 'domains/reservation/constants';
-import type { Room, Reservation } from 'domains/reservation/types';
+import { EQUIPMENT_LABELS } from 'constants/reservation';
+import type { Room, Reservation } from 'models/reservation';
 
 interface Props {
   reservations: Reservation[];

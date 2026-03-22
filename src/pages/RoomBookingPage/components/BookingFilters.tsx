@@ -1,8 +1,8 @@
 import { css } from '@emotion/react';
 import { Spacing, Text, Select } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
-import { ALL_EQUIPMENT, EQUIPMENT_LABELS, TIME_SLOTS } from 'domains/reservation/constants';
-import { formatDate } from 'domains/reservation/utils';
+import { ALL_EQUIPMENT, EQUIPMENT_LABELS, TIME_SLOTS } from 'constants/reservation';
+import { formatDate } from 'utils/reservation';
 import type { useBookingForm } from '../hooks/useBookingForm';
 
 type BookingForm = ReturnType<typeof useBookingForm>;

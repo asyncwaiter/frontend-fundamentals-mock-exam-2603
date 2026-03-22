@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import type { Equipment } from 'domains/reservation/types';
-import { formatDate } from 'domains/reservation/utils';
+import type { Equipment } from 'models/reservation';
+import { formatDate } from 'utils/reservation';
 
 export interface BookingFormState {
   date: string;

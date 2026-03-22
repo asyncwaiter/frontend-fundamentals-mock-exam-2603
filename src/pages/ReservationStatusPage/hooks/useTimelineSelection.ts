@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { TIME_SLOTS } from 'domains/reservation/constants';
+import { TIME_SLOTS } from 'constants/reservation';
 
 interface TimelineSelection {
   roomId: string;

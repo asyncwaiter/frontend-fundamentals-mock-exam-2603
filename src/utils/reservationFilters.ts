@@ -1,4 +1,4 @@
-import type { Room, Reservation, Equipment } from 'domains/reservation/types';
+import type { Room, Reservation, Equipment } from 'models/reservation';
 
 interface FilterCriteria {
   date: string;

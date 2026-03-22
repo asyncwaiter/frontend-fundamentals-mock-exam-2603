@@ -2,9 +2,9 @@ import { css } from '@emotion/react';
 import { useState } from 'react';
 import { Text } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
-import { HOUR_LABELS, TOTAL_MINUTES } from 'domains/reservation/constants';
-import { timeToMinutes } from 'domains/reservation/utils';
-import type { Room, Reservation } from 'domains/reservation/types';
+import { HOUR_LABELS, TOTAL_MINUTES } from 'constants/reservation';
+import { timeToMinutes } from 'utils/reservation';
+import type { Room, Reservation } from 'models/reservation';
 import { TimelineRow } from './TimelineRow';
 
 interface TimelineSelection {

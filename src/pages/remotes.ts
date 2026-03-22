@@ -1,5 +1,5 @@
 import { http } from 'pages/http';
-import type { Room, Reservation } from 'domains/reservation/types';
+import type { Room, Reservation } from 'models/reservation';
 
 export function getRooms() {
   return http.get<Room[]>('/api/rooms');

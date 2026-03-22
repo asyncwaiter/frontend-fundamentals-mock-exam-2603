@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { Spacing, Text, Button } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
-import type { Room } from 'domains/reservation/types';
+import type { Room } from 'models/reservation';
 import { RoomCard } from './RoomCard';
 
 interface Props {
