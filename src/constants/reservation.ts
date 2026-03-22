@@ -1,4 +1,4 @@
-import type { Equipment } from './types';
+import type { Equipment } from 'models/reservation';
 
 export const EQUIPMENT_LABELS: Record<Equipment, string> = {
   tv: 'TV',
