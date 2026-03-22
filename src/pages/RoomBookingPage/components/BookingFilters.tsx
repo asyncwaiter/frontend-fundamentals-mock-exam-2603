@@ -1,9 +1,11 @@
 import { css } from '@emotion/react';
 import { Spacing, Text, Select } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
-import { ALL_EQUIPMENT, EQUIPMENT_LABELS, TIME_SLOTS } from 'constants/reservation';
+import { TIME_SLOTS } from 'constants/reservation';
 import { formatDate } from 'utils/reservation';
-import type { useBookingForm } from '../hooks/useBookingForm';
+import { EquipmentToggleGroup } from 'components/EquipmentToggleGroup';
+import { inputStyle } from 'styles/inputs';
+import type { useBookingForm } from 'hooks/useBookingForm';
 
 type BookingForm = ReturnType<typeof useBookingForm>;
 
@@ -97,42 +99,8 @@ export function BookingFilters({ form, floors }: Props) {
       </div>
       <Spacing size={14} />
 
-      {/* 장비 */}
-      <div>
-        <Text as="label" typography="t7" fontWeight="medium" color={colors.grey600}>필요 장비</Text>
-        <Spacing size={8} />
-        <div css={css`display: flex; gap: 8px; flex-wrap: wrap;`}>
-          {ALL_EQUIPMENT.map(eq => {
-            const selected = form.equipment.includes(eq);
-            return (
-              <button
-                key={eq}
-                type="button"
-                onClick={() => form.toggleEquipment(eq)}
-                aria-label={EQUIPMENT_LABELS[eq]}
-                aria-pressed={selected}
-                css={css`
-                  padding: 8px 16px; border-radius: 20px;
-                  border: 1px solid ${selected ? colors.blue500 : colors.grey200};
-                  background: ${selected ? colors.blue50 : colors.grey50};
-                  color: ${selected ? colors.blue600 : colors.grey700};
-                  font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s;
-                  &:hover { border-color: ${selected ? colors.blue500 : colors.grey400}; }
-                `}
-              >
-                {EQUIPMENT_LABELS[eq]}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <EquipmentToggleGroup selected={form.equipment} onToggle={form.toggleEquipment} />
     </div>
   );
 }
 
-const inputStyle = css`
-  box-sizing: border-box; font-size: 16px; font-weight: 500; line-height: 1.5; height: 48px;
-  background-color: ${colors.grey50}; border-radius: 12px; color: ${colors.grey800};
-  width: 100%; border: 1px solid ${colors.grey200}; padding: 0 16px; outline: none;
-  transition: border-color 0.15s; &:focus { border-color: ${colors.blue500}; }
-`;

@@ -1,14 +1,14 @@
 import { css } from '@emotion/react';
-import { useState } from 'react';
 import { Spacing, Text, Button, Select } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
-import { ALL_EQUIPMENT, EQUIPMENT_LABELS } from 'constants/reservation';
 import { filterAvailableRooms } from 'utils/reservationFilters';
 import { useRooms } from 'hooks/useRooms';
 import { useReservations } from 'hooks/useReservations';
 import { useMessage } from 'hooks/useMessage';
-import { useBooking } from 'pages/RoomBookingPage/hooks/useBooking';
-import type { Equipment } from 'models/reservation';
+import { useCreateReservation } from 'hooks/useReservations';
+import { useBookingForm } from 'hooks/useBookingForm';
+import { EquipmentToggleGroup } from 'components/EquipmentToggleGroup';
+import { inputStyle } from 'styles/inputs';
 
 interface Props {
   roomId: string;
@@ -21,34 +21,28 @@ interface Props {
 export function BookingModal({ roomId, date, startTime, endTime, onClose }: Props) {
   const { data: rooms = [] } = useRooms();
   const { data: reservations = [] } = useReservations(date);
-
-  const [selectedRoomId, setSelectedRoomId] = useState(roomId);
-  const [attendees, setAttendees] = useState(1);
-  const [equipment, setEquipment] = useState<Equipment[]>([]);
-  const [preferredFloor, setPreferredFloor] = useState<number | null>(null);
   const { showMessage } = useMessage();
 
-  // 필터 조건에 맞는 회의실 목록
+  const form = useBookingForm({
+    date,
+    startTime,
+    endTime,
+    selectedRoomId: roomId,
+  });
+
   const availableRooms = filterAvailableRooms(
     rooms, reservations,
-    { date, startTime, endTime, attendees, equipment, preferredFloor }
+    { date, startTime, endTime, attendees: form.attendees, equipment: form.equipment, preferredFloor: form.preferredFloor }
   );
 
-  // 선택된 방이 필터 결과에 없으면 첫 번째 방으로 자동 전환
-  const isSelectedInList = availableRooms.some(r => r.id === selectedRoomId);
+  const isSelectedInList = availableRooms.some(r => r.id === form.selectedRoomId);
   const effectiveRoomId = isSelectedInList
-    ? selectedRoomId
+    ? form.selectedRoomId
     : availableRooms[0]?.id ?? null;
 
   const floors = [...new Set(rooms.map(r => r.floor))].sort((a, b) => a - b);
 
-  const { book, isLoading } = useBooking({ onSuccess: onClose });
-
-  const toggleEquipment = (eq: Equipment) => {
-    setEquipment(prev =>
-      prev.includes(eq) ? prev.filter(e => e !== eq) : [...prev, eq]
-    );
-  };
+  const createReservation = useCreateReservation();
 
   const handleBook = () => {
     if (!effectiveRoomId) {
@@ -56,13 +50,15 @@ export function BookingModal({ roomId, date, startTime, endTime, onClose }: Prop
       return;
     }
 
-    book({
+    createReservation.mutate({
       roomId: effectiveRoomId,
       date,
       start: startTime,
       end: endTime,
-      attendees,
-      equipment,
+      attendees: form.attendees,
+      equipment: form.equipment,
+    }, {
+      onSuccess: onClose,
     });
   };
 
@@ -97,16 +93,16 @@ export function BookingModal({ roomId, date, startTime, endTime, onClose }: Prop
             <input
               type="number"
               min={1}
-              value={attendees}
-              onChange={e => setAttendees(Math.max(1, Number(e.target.value)))}
+              value={form.attendees}
+              onChange={e => form.setAttendees(Number(e.target.value))}
               css={inputStyle}
             />
           </div>
           <div css={css`display: flex; flex-direction: column; gap: 6px; flex: 1;`}>
             <Text as="label" typography="t7" fontWeight="medium" color={colors.grey600}>선호 층</Text>
             <Select
-              value={preferredFloor ?? ''}
-              onChange={e => setPreferredFloor(e.target.value === '' ? null : Number(e.target.value))}
+              value={form.preferredFloor ?? ''}
+              onChange={e => form.setPreferredFloor(e.target.value === '' ? null : Number(e.target.value))}
             >
               <option value="">전체</option>
               {floors.map(f => (
@@ -118,32 +114,7 @@ export function BookingModal({ roomId, date, startTime, endTime, onClose }: Prop
 
         <Spacing size={14} />
 
-        {/* 필요 장비 */}
-        <div>
-          <Text as="label" typography="t7" fontWeight="medium" color={colors.grey600}>필요 장비</Text>
-          <Spacing size={8} />
-          <div css={css`display: flex; gap: 8px; flex-wrap: wrap;`}>
-            {ALL_EQUIPMENT.map(eq => {
-              const selected = equipment.includes(eq);
-              return (
-                <button
-                  key={eq}
-                  type="button"
-                  onClick={() => toggleEquipment(eq)}
-                  css={css`
-                    padding: 6px 12px; border-radius: 16px; font-size: 13px; font-weight: 500;
-                    cursor: pointer; transition: all 0.15s;
-                    border: 1px solid ${selected ? colors.blue500 : colors.grey200};
-                    background: ${selected ? colors.blue50 : colors.grey50};
-                    color: ${selected ? colors.blue600 : colors.grey700};
-                  `}
-                >
-                  {EQUIPMENT_LABELS[eq]}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <EquipmentToggleGroup selected={form.equipment} onToggle={form.toggleEquipment} />
 
         <Spacing size={14} />
 
@@ -160,7 +131,7 @@ export function BookingModal({ roomId, date, startTime, endTime, onClose }: Prop
           ) : (
             <Select
               value={effectiveRoomId ?? ''}
-              onChange={e => setSelectedRoomId(e.target.value)}
+              onChange={e => form.selectRoom(e.target.value)}
             >
               {availableRooms.map(room => (
                 <option key={room.id} value={room.id}>{room.name}</option>
@@ -176,19 +147,12 @@ export function BookingModal({ roomId, date, startTime, endTime, onClose }: Prop
           <Button
             display="full"
             onClick={handleBook}
-            disabled={isLoading || availableRooms.length === 0}
+            disabled={createReservation.isLoading || availableRooms.length === 0}
           >
-            {isLoading ? '예약 중...' : '예약하기'}
+            {createReservation.isLoading ? '예약 중...' : '예약하기'}
           </Button>
         </div>
       </div>
     </div>
   );
 }
-
-const inputStyle = css`
-  box-sizing: border-box; font-size: 16px; font-weight: 500; line-height: 1.5; height: 48px;
-  background-color: ${colors.grey50}; border-radius: 12px; color: ${colors.grey800};
-  width: 100%; border: 1px solid ${colors.grey200}; padding: 0 16px; outline: none;
-  transition: border-color 0.15s; &:focus { border-color: ${colors.blue500}; }
-`;
