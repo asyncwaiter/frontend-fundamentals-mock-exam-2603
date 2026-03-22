@@ -36,8 +36,8 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <GlobalPortal.Provider>
-        <OverlayProvider>
-          <MessageProvider>
+        <MessageProvider>
+          <OverlayProvider>
           <Global
             styles={css`
               ${normalize}
@@ -51,8 +51,8 @@ export default function App() {
           <PageLayout>
             <Routes />
           </PageLayout>
-          </MessageProvider>
-        </OverlayProvider>
+          </OverlayProvider>
+        </MessageProvider>
       </GlobalPortal.Provider>
     </QueryClientProvider>
   );
