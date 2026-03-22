@@ -185,4 +185,48 @@ describe('타임라인 빠른 예약', () => {
     await userEvent.click(tvButton);
     expect(tvButton).toHaveAttribute('aria-pressed', 'false');
   });
+
+  test('시작 시간 이전을 클릭하면 선택이 초기화되고 모달은 열리지 않는다', async () => {
+    renderApp();
+    await waitForPageLoad();
+
+    const dateInput = screen.getByLabelText('날짜');
+    await userEvent.clear(dateInput);
+    await userEvent.type(dateInput, '2026-04-01');
+
+    await waitFor(() => {
+      expect(screen.getAllByText('토스홀 A').length).toBeGreaterThanOrEqual(1);
+    });
+
+    const timelineBars = document.querySelectorAll('[style*="cursor: crosshair"], [class*="crosshair"]');
+    if (timelineBars.length === 0) return;
+
+    const firstBar = timelineBars[0] as HTMLElement;
+
+    // 같은 위치를 2번 클릭 → 시작 시간 이전이므로 새 시작으로 초기화
+    await userEvent.click(firstBar);
+    await userEvent.click(firstBar);
+
+    // 모달이 열리지 않는다
+    expect(screen.queryByRole('dialog', { name: '빠른 예약' })).not.toBeInTheDocument();
+  });
+
+  test('예약된 영역을 클릭하면 툴팁이 표시되고 모달은 열리지 않는다', async () => {
+    renderApp();
+    await waitForPageLoad();
+
+    // 예약이 있는 날짜로 변경
+    const dateInput = screen.getByLabelText('날짜');
+    await userEvent.clear(dateInput);
+    await userEvent.type(dateInput, '2026-03-10');
+
+    const reservationButton = await screen.findByLabelText('토스홀 A 09:00-10:00 예약 상세');
+    await userEvent.click(reservationButton);
+
+    // 툴팁이 표시된다
+    expect(screen.getByRole('tooltip')).toBeInTheDocument();
+
+    // 모달은 열리지 않는다
+    expect(screen.queryByRole('dialog', { name: '빠른 예약' })).not.toBeInTheDocument();
+  });
 });

@@ -26,12 +26,12 @@ export function useTimelineSelection(onComplete: (roomId: string, startTime: str
         return { roomId, startTime: time, endTime: null };
       }
 
-      // 두 번째 클릭: 종료 시간 설정
-      const endTime = time <= prev.startTime
-        ? nextSlot(prev.startTime) // 같거나 이전 시간 클릭 시 30분 기본 블록
-        : nextSlot(time);
+      // 두 번째 클릭: 시작 시간 이전이면 새로운 시작으로 초기화
+      if (time <= prev.startTime) {
+        return { roomId, startTime: time, endTime: null };
+      }
 
-      onComplete(roomId, prev.startTime, endTime);
+      onComplete(roomId, prev.startTime, nextSlot(time));
       return null;
     });
   }, [onComplete]);
