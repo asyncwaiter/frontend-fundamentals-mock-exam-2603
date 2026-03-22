@@ -17,3 +17,12 @@ export interface Reservation {
   attendees: number;
   equipment: Equipment[];
 }
+
+export interface CreateReservationParams {
+  roomId: string;
+  date: string;
+  start: string;
+  end: string;
+  attendees: number;
+  equipment: Equipment[];
+}

@@ -8,8 +8,8 @@ import { useRooms } from 'hooks/useRooms';
 import { useReservations } from 'hooks/useReservations';
 import { useBookingForm, type BookingFormState } from 'hooks/useBookingForm';
 import { useMessage } from 'hooks/useMessage';
+import { useCreateReservation } from 'hooks/useReservations';
 import { filterAvailableRooms } from 'utils/reservationFilters';
-import { useBooking } from './hooks/useBooking';
 import { BookingFilters } from './components/BookingFilters';
 import { RoomList } from './components/RoomList';
 
@@ -64,7 +64,7 @@ export function RoomBookingPage() {
     setSearchParams(params, { replace: true });
   }, [form.date, form.startTime, form.endTime, form.attendees, form.equipment, form.preferredFloor, setSearchParams]);
 
-  const { book, isLoading } = useBooking();
+  const createReservation = useCreateReservation();
 
   const handleBook = () => {
     if (!form.selectedRoomId) {
@@ -72,13 +72,15 @@ export function RoomBookingPage() {
       return;
     }
 
-    book({
+    createReservation.mutate({
       roomId: form.selectedRoomId,
       date: form.date,
       start: form.startTime,
       end: form.endTime,
       attendees: form.attendees,
       equipment: form.equipment,
+    }, {
+      onSuccess: () => navigate('/'),
     });
   };
 
@@ -137,7 +139,7 @@ export function RoomBookingPage() {
           selectedRoomId={form.selectedRoomId}
           onSelect={form.selectRoom}
           onBook={handleBook}
-          isLoading={isLoading}
+          isLoading={createReservation.isLoading}
         />
       )}
 

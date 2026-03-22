@@ -14,6 +14,7 @@ export function useMyReservations() {
 
 export function useCreateReservation() {
   const queryClient = useQueryClient();
+  const { showMessage } = useMessage();
 
   return useMutation(
     (data: { roomId: string; date: string; start: string; end: string; attendees: number; equipment: string[] }) =>
@@ -22,6 +23,10 @@ export function useCreateReservation() {
       onSuccess: (_data, variables) => {
         queryClient.invalidateQueries(['reservations', variables.date]);
         queryClient.invalidateQueries(['myReservations']);
+        showMessage({ type: 'success', text: '예약이 완료되었습니다!' });
+      },
+      onError: () => {
+        showMessage({ type: 'error', text: '예약에 실패했습니다.' });
       },
     }
   );
