@@ -7,12 +7,20 @@ import { timeToMinutes } from 'domains/reservation/utils';
 import type { Room, Reservation } from 'domains/reservation/types';
 import { TimelineRow } from './TimelineRow';
 
+interface TimelineSelection {
+  roomId: string;
+  startTime: string;
+  endTime: string | null;
+}
+
 interface Props {
   rooms: Room[];
   reservations: Reservation[];
+  selection?: TimelineSelection | null;
+  onSlotClick?: (roomId: string, time: string) => void;
 }
 
-export function Timeline({ rooms, reservations }: Props) {
+export function Timeline({ rooms, reservations, selection, onSlotClick }: Props) {
   const [activeReservation, setActiveReservation] = useState<string | null>(null);
 
   return (
@@ -49,6 +57,8 @@ export function Timeline({ rooms, reservations }: Props) {
           activeReservation={activeReservation}
           onToggle={id => setActiveReservation(activeReservation === id ? null : id)}
           isFirst={index === 0}
+          selection={selection?.roomId === room.id ? selection : null}
+          onSlotClick={onSlotClick ? (time) => onSlotClick(room.id, time) : undefined}
         />
       ))}
     </div>
