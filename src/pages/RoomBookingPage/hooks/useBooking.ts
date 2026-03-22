@@ -13,9 +13,10 @@ interface CreateReservationParams {
 
 interface UseBookingOptions {
   onError: (message: string) => void;
+  onSuccess?: () => void;
 }
 
-export function useBooking({ onError }: UseBookingOptions) {
+export function useBooking({ onError, onSuccess }: UseBookingOptions) {
   const navigate = useNavigate();
   const mutation = useCreateReservationMutation();
 
@@ -24,6 +25,7 @@ export function useBooking({ onError }: UseBookingOptions) {
       const result = await mutation.mutateAsync(params);
 
       if ('ok' in result && result.ok) {
+        onSuccess?.();
         navigate('/', { state: { message: '예약이 완료되었습니다!' } });
         return;
       }

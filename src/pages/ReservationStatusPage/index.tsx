@@ -1,18 +1,22 @@
 import { css } from '@emotion/react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Top, Spacing, Border, Button, Text } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import { formatDate } from 'domains/reservation/utils';
 import { useRooms } from 'domains/reservation/hooks/useRooms';
 import { useReservations, useMyReservations, useCancelReservation } from 'domains/reservation/hooks/useReservations';
+import { useOverlay } from '_tosslib/overlay';
 import { Timeline } from './components/Timeline';
 import { MyReservationList } from './components/MyReservationList';
+import { BookingModal } from './components/BookingModal';
+import { useTimelineSelection } from './hooks/useTimelineSelection';
 
 export function ReservationStatusPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [date, setDate] = useState(formatDate(new Date()));
+  const overlay = useOverlay();
 
   const locationState = location.state as { message?: string } | null;
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(
@@ -38,6 +42,21 @@ export function ReservationStatusPage() {
       setMessage({ type: 'error', text: '취소에 실패했습니다.' });
     }
   };
+
+  // 타임라인 2클릭 → overlay로 모달 오픈
+  const openBookingModal = useCallback((roomId: string, startTime: string, endTime: string) => {
+    overlay.open(({ close }) => (
+      <BookingModal
+        roomId={roomId}
+        date={date}
+        startTime={startTime}
+        endTime={endTime}
+        onClose={() => { close(); clearSelection(); }}
+      />
+    ));
+  }, [date, overlay]);
+
+  const { selection, handleSlotClick, clearSelection } = useTimelineSelection(openBookingModal);
 
   return (
     <div css={css`background: ${colors.white}; padding-bottom: 40px;`}>
@@ -74,13 +93,23 @@ export function ReservationStatusPage() {
       <Border size={8} />
       <Spacing size={24} />
 
-      {/* 예약 현황 타임라인 */}
+      {/* 예약 현황 타임라인 — 빈 영역 클릭으로 빠른 예약 */}
       <div css={css`padding: 0 24px;`}>
-        <Text typography="t5" fontWeight="bold" color={colors.grey900}>
-          예약 현황
-        </Text>
+        <div css={css`display: flex; align-items: baseline; gap: 8px;`}>
+          <Text typography="t5" fontWeight="bold" color={colors.grey900}>
+            예약 현황
+          </Text>
+          <Text typography="t7" color={colors.grey400}>
+            빈 시간을 클릭하여 바로 예약
+          </Text>
+        </div>
         <Spacing size={16} />
-        <Timeline rooms={rooms} reservations={reservations} />
+        <Timeline
+          rooms={rooms}
+          reservations={reservations}
+          selection={selection}
+          onSlotClick={handleSlotClick}
+        />
       </div>
 
       <Spacing size={24} />
