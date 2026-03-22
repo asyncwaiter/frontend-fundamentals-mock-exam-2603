@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Top, Spacing, Border } from '_tosslib/components';
+import { Top, Spacing, Border, Button } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import type { Equipment } from 'models/reservation';
 import { useRooms } from 'hooks/useRooms';
@@ -127,13 +127,19 @@ export function RoomBookingPage() {
       <Spacing size={24} />
 
       {form.isFilterComplete && (
-        <RoomList
-          rooms={availableRooms}
-          selectedRoomId={form.selectedRoomId}
-          onSelect={form.selectRoom}
-          onBook={handleBook}
-          isLoading={createReservation.isLoading}
-        />
+        <>
+          <RoomList
+            rooms={availableRooms}
+            selectedRoomId={form.selectedRoomId}
+            onSelect={form.selectRoom}
+          />
+          <Spacing size={16} />
+          <div css={css`padding: 0 24px;`}>
+            <Button display="full" onClick={handleBook} disabled={createReservation.status === 'loading'}>
+              {createReservation.status === 'loading' ? '예약 중...' : '확정'}
+            </Button>
+          </div>
+        </>
       )}
 
       <Spacing size={24} />

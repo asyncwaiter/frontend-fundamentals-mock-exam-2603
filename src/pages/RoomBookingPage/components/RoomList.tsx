@@ -1,5 +1,5 @@
 import { css } from '@emotion/react';
-import { Spacing, Text, Button } from '_tosslib/components';
+import { Spacing, Text } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import type { Room } from 'models/reservation';
 import { RoomCard } from './RoomCard';
@@ -8,11 +8,9 @@ interface Props {
   rooms: Room[];
   selectedRoomId: string | null;
   onSelect: (id: string) => void;
-  onBook: () => void;
-  isLoading: boolean;
 }
 
-export function RoomList({ rooms, selectedRoomId, onSelect, onBook, isLoading }: Props) {
+export function RoomList({ rooms, selectedRoomId, onSelect }: Props) {
   return (
     <div css={css`padding: 0 24px;`}>
       <div css={css`display: flex; align-items: baseline; gap: 6px;`}>
@@ -44,10 +42,6 @@ export function RoomList({ rooms, selectedRoomId, onSelect, onBook, isLoading }:
         </div>
       )}
 
-      <Spacing size={16} />
-      <Button display="full" onClick={onBook} disabled={isLoading}>
-        {isLoading ? '예약 중...' : '확정'}
-      </Button>
     </div>
   );
 }
