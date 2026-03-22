@@ -1,13 +1,14 @@
 import { css } from '@emotion/react';
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Top, Spacing, Border, Text } from '_tosslib/components';
+import { Top, Spacing, Border } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import type { Equipment } from 'models/reservation';
 import { useRooms } from 'hooks/useRooms';
 import { useReservations } from 'hooks/useReservations';
 import { useBookingForm, type BookingFormState } from 'hooks/useBookingForm';
 import { useMessage } from 'hooks/useMessage';
+import { MessageBanner } from 'components/MessageBanner';
 import { useCreateReservation } from 'hooks/useReservations';
 import { filterAvailableRooms } from 'utils/reservationFilters';
 import { BookingFilters } from './components/BookingFilters';
@@ -106,15 +107,7 @@ export function RoomBookingPage() {
       {message && (
         <div css={css`padding: 0 24px;`}>
           <Spacing size={12} />
-          <div
-            css={css`
-              padding: 10px 14px; border-radius: 10px;
-              background: ${message.type === 'success' ? colors.blue50 : colors.red50};
-              display: flex; align-items: center; gap: 8px;
-            `}
-          >
-            <Text typography="t7" fontWeight="medium" color={message.type === 'success' ? colors.blue600 : colors.red500}>{message.text}</Text>
-          </div>
+          <MessageBanner message={message} />
         </div>
       )}
 

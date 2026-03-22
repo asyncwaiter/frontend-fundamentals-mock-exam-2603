@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getReservations, getMyReservations, cancelReservation, createReservation } from 'pages/remotes';
+import type { CreateReservationParams } from 'models/reservation';
 import { useMessage } from 'hooks/useMessage';
 
 export function useReservations(date: string) {
@@ -17,8 +18,7 @@ export function useCreateReservation() {
   const { showMessage } = useMessage();
 
   return useMutation(
-    (data: { roomId: string; date: string; start: string; end: string; attendees: number; equipment: string[] }) =>
-      createReservation(data),
+    (data: CreateReservationParams) => createReservation(data),
     {
       onSuccess: (_data, variables) => {
         queryClient.invalidateQueries(['reservations', variables.date]);

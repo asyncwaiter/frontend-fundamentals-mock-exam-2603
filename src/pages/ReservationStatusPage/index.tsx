@@ -8,6 +8,7 @@ import { useRooms } from 'hooks/useRooms';
 import { useReservations, useMyReservations, useCancelReservation } from 'hooks/useReservations';
 import { useOverlay } from '_tosslib/overlay';
 import { useMessage } from 'hooks/useMessage';
+import { MessageBanner } from 'components/MessageBanner';
 import { Timeline } from './components/Timeline';
 import { MyReservationList } from './components/MyReservationList';
 import { BookingModal } from './components/BookingModal';
@@ -97,24 +98,9 @@ export function ReservationStatusPage() {
       <Border size={8} />
       <Spacing size={24} />
 
-      {/* 메시지 배너 */}
       {message && (
         <div css={css`padding: 0 24px;`}>
-          <div
-            css={css`
-              padding: 10px 14px; border-radius: 10px;
-              background: ${message.type === 'success' ? colors.blue50 : colors.red50};
-              display: flex; align-items: center; gap: 8px;
-            `}
-          >
-            <Text
-              typography="t7"
-              fontWeight="medium"
-              color={message.type === 'success' ? colors.blue600 : colors.red500}
-            >
-              {message.text}
-            </Text>
-          </div>
+          <MessageBanner message={message} />
           <Spacing size={12} />
         </div>
       )}
