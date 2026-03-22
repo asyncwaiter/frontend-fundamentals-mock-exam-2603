@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useCreateReservation as useCreateReservationMutation } from 'domains/reservation/hooks/useReservations';
+import { useCreateReservation as useCreateReservationMutation } from 'hooks/useReservations';
+import { useMessage } from 'hooks/useMessage';
 
 interface CreateReservationParams {
   roomId: string;
@@ -18,6 +19,7 @@ interface UseBookingOptions {
 
 export function useBooking({ onError, onSuccess }: UseBookingOptions) {
   const navigate = useNavigate();
+  const { showMessage } = useMessage();
   const mutation = useCreateReservationMutation();
 
   const handleBook = async (params: CreateReservationParams) => {
@@ -26,7 +28,8 @@ export function useBooking({ onError, onSuccess }: UseBookingOptions) {
 
       if ('ok' in result && result.ok) {
         onSuccess?.();
-        navigate('/', { state: { message: '예약이 완료되었습니다!' } });
+        showMessage({ type: 'success', text: '예약이 완료되었습니다!' });
+        navigate('/');
         return;
       }
 

@@ -1,12 +1,13 @@
 import { css } from '@emotion/react';
-import { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Top, Spacing, Border, Button, Text } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
-import { formatDate } from 'domains/reservation/utils';
-import { useRooms } from 'domains/reservation/hooks/useRooms';
-import { useReservations, useMyReservations, useCancelReservation } from 'domains/reservation/hooks/useReservations';
+import { formatDate } from 'utils/reservation';
+import { useRooms } from 'hooks/useRooms';
+import { useReservations, useMyReservations, useCancelReservation } from 'hooks/useReservations';
 import { useOverlay } from '_tosslib/overlay';
+import { useMessage } from 'hooks/useMessage';
 import { Timeline } from './components/Timeline';
 import { MyReservationList } from './components/MyReservationList';
 import { BookingModal } from './components/BookingModal';
@@ -14,20 +15,9 @@ import { useTimelineSelection } from './hooks/useTimelineSelection';
 
 export function ReservationStatusPage() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [date, setDate] = useState(formatDate(new Date()));
   const overlay = useOverlay();
-
-  const locationState = location.state as { message?: string } | null;
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(
-    locationState?.message ? { type: 'success', text: locationState.message } : null
-  );
-
-  useEffect(() => {
-    if (locationState?.message) {
-      window.history.replaceState({}, '');
-    }
-  }, [locationState]);
+  const { message, showMessage } = useMessage();
 
   const { data: rooms = [] } = useRooms();
   const { data: reservations = [] } = useReservations(date);
@@ -37,9 +27,9 @@ export function ReservationStatusPage() {
   const handleCancel = async (id: string) => {
     try {
       await cancelMutation.mutateAsync(id);
-      setMessage({ type: 'success', text: '예약이 취소되었습니다.' });
+      showMessage({ type: 'success', text: '예약이 취소되었습니다.' });
     } catch {
-      setMessage({ type: 'error', text: '취소에 실패했습니다.' });
+      showMessage({ type: 'error', text: '취소에 실패했습니다.' });
     }
   };
 
