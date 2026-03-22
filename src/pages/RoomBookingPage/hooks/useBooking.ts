@@ -13,11 +13,10 @@ interface CreateReservationParams {
 }
 
 interface UseBookingOptions {
-  onError: (message: string) => void;
   onSuccess?: () => void;
 }
 
-export function useBooking({ onError, onSuccess }: UseBookingOptions) {
+export function useBooking({ onSuccess }: UseBookingOptions = {}) {
   const navigate = useNavigate();
   const { showMessage } = useMessage();
   const mutation = useCreateReservationMutation();
@@ -34,14 +33,14 @@ export function useBooking({ onError, onSuccess }: UseBookingOptions) {
       }
 
       const errResult = result as { message?: string };
-      onError(errResult.message ?? '예약에 실패했습니다.');
+      showMessage({ type: 'error', text: errResult.message ?? '예약에 실패했습니다.' });
     } catch (err: unknown) {
       let serverMessage = '예약에 실패했습니다.';
       if (axios.isAxiosError(err)) {
         const data = err.response?.data as { message?: string } | undefined;
         serverMessage = data?.message ?? serverMessage;
       }
-      onError(serverMessage);
+      showMessage({ type: 'error', text: serverMessage });
     }
   };
 

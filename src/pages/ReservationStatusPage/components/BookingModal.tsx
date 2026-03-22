@@ -6,6 +6,7 @@ import { ALL_EQUIPMENT, EQUIPMENT_LABELS } from 'constants/reservation';
 import { filterAvailableRooms } from 'utils/reservationFilters';
 import { useRooms } from 'hooks/useRooms';
 import { useReservations } from 'hooks/useReservations';
+import { useMessage } from 'hooks/useMessage';
 import { useBooking } from 'pages/RoomBookingPage/hooks/useBooking';
 import type { Equipment } from 'models/reservation';
 
@@ -25,7 +26,7 @@ export function BookingModal({ roomId, date, startTime, endTime, onClose }: Prop
   const [attendees, setAttendees] = useState(1);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [preferredFloor, setPreferredFloor] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { showMessage } = useMessage();
 
   // 필터 조건에 맞는 회의실 목록
   const availableRooms = filterAvailableRooms(
@@ -41,10 +42,7 @@ export function BookingModal({ roomId, date, startTime, endTime, onClose }: Prop
 
   const floors = [...new Set(rooms.map(r => r.floor))].sort((a, b) => a - b);
 
-  const { book, isLoading } = useBooking({
-    onSuccess: onClose,
-    onError: (message) => setError(message),
-  });
+  const { book, isLoading } = useBooking({ onSuccess: onClose });
 
   const toggleEquipment = (eq: Equipment) => {
     setEquipment(prev =>
@@ -54,11 +52,10 @@ export function BookingModal({ roomId, date, startTime, endTime, onClose }: Prop
 
   const handleBook = () => {
     if (!effectiveRoomId) {
-      setError('예약 가능한 회의실이 없습니다.');
+      showMessage({ type: 'error', text: '예약 가능한 회의실이 없습니다.' });
       return;
     }
 
-    setError(null);
     book({
       roomId: effectiveRoomId,
       date,
@@ -90,15 +87,6 @@ export function BookingModal({ roomId, date, startTime, endTime, onClose }: Prop
         <Text typography="t7" color={colors.grey400}>
           {date} {startTime} ~ {endTime}
         </Text>
-
-        {error && (
-          <>
-            <Spacing size={12} />
-            <div css={css`padding: 10px 14px; border-radius: 10px; background: ${colors.red50};`}>
-              <Text typography="t7" fontWeight="medium" color={colors.red500}>{error}</Text>
-            </div>
-          </>
-        )}
 
         <Spacing size={16} />
 

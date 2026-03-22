@@ -17,21 +17,12 @@ export function ReservationStatusPage() {
   const navigate = useNavigate();
   const [date, setDate] = useState(formatDate(new Date()));
   const overlay = useOverlay();
-  const { message, showMessage } = useMessage();
+  const { message } = useMessage();
 
   const { data: rooms = [] } = useRooms();
   const { data: reservations = [] } = useReservations(date);
   const { data: myReservationList = [] } = useMyReservations();
-  const cancelMutation = useCancelReservation();
-
-  const handleCancel = async (id: string) => {
-    try {
-      await cancelMutation.mutateAsync(id);
-      showMessage({ type: 'success', text: '예약이 취소되었습니다.' });
-    } catch {
-      showMessage({ type: 'error', text: '취소에 실패했습니다.' });
-    }
-  };
+  const { mutate: cancelReservation } = useCancelReservation();
 
   // 타임라인 2클릭 → overlay로 모달 오픈
   const openBookingModal = useCallback((roomId: string, startTime: string, endTime: string) => {
@@ -131,7 +122,7 @@ export function ReservationStatusPage() {
       <MyReservationList
         reservations={myReservationList}
         rooms={rooms}
-        onCancel={handleCancel}
+        onCancel={cancelReservation}
       />
 
       <Spacing size={24} />
