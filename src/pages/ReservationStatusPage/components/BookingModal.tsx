@@ -147,9 +147,9 @@ export function BookingModal({ roomId, date, startTime, endTime, onClose }: Prop
           <Button
             display="full"
             onClick={handleBook}
-            disabled={createReservation.isLoading || availableRooms.length === 0}
+            disabled={createReservation.status === 'loading' || availableRooms.length === 0}
           >
-            {createReservation.isLoading ? '예약 중...' : '예약하기'}
+            {createReservation.status === 'loading' ? '예약 중...' : '예약하기'}
           </Button>
         </div>
       </div>

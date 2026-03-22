@@ -1,6 +1,6 @@
 import normalize from 'emotion-normalize';
 import { css, Global } from '@emotion/react';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
 import { GlobalPortal } from './GlobalPortal';
 import { OverlayProvider } from '_tosslib/overlay';
@@ -28,6 +28,7 @@ export default function App() {
           queries: {
             refetchOnWindowFocus: false,
             retry: false,
+            suspense: true,
           },
         },
       })
@@ -49,7 +50,9 @@ export default function App() {
             `}
           />
           <PageLayout>
-            <Routes />
+            <Suspense fallback={<div css={css`display: flex; justify-content: center; padding: 80px 0;`}>로딩 중...</div>}>
+              <Routes />
+            </Suspense>
           </PageLayout>
           </OverlayProvider>
         </MessageProvider>
