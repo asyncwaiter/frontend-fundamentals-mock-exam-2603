@@ -1,6 +1,6 @@
-import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 
-interface Message {
+export interface Message {
   type: 'success' | 'error';
   text: string;
 }
@@ -11,6 +11,9 @@ interface MessageContextValue {
   clearMessage: () => void;
 }
 
+let globalShowMessage: ((msg: Message) => void) | null = null;
+export function getGlobalShowMessage() { return globalShowMessage; }
+
 const MessageContext = createContext<MessageContextValue | null>(null);
 
 export function MessageProvider({ children }: { children: ReactNode }) {
@@ -18,6 +21,11 @@ export function MessageProvider({ children }: { children: ReactNode }) {
 
   const showMessage = useCallback((msg: Message) => setMessage(msg), []);
   const clearMessage = useCallback(() => setMessage(null), []);
+
+  useEffect(() => {
+    globalShowMessage = showMessage;
+    return () => { globalShowMessage = null; };
+  }, [showMessage]);
 
   return (
     <MessageContext.Provider value={{ message, showMessage, clearMessage }}>

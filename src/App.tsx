@@ -1,10 +1,10 @@
 import normalize from 'emotion-normalize';
 import { css, Global } from '@emotion/react';
 import { useState } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
 import { GlobalPortal } from './GlobalPortal';
 import { OverlayProvider } from '_tosslib/overlay';
-import { MessageProvider } from 'hooks/useMessage';
+import { MessageProvider, getGlobalShowMessage } from 'hooks/useMessage';
 
 import '_tosslib/sass/app.scss';
 import { PageLayout } from 'pages/PageLayout';
@@ -14,6 +14,16 @@ export default function App() {
   const [queryClient] = useState(
     () =>
       new QueryClient({
+        queryCache: new QueryCache({
+          onError: () => {
+            getGlobalShowMessage()?.({ type: 'error', text: '데이터를 불러오는 데 실패했습니다.' });
+          },
+        }),
+        mutationCache: new MutationCache({
+          onError: () => {
+            getGlobalShowMessage()?.({ type: 'error', text: '요청 처리에 실패했습니다.' });
+          },
+        }),
         defaultOptions: {
           queries: {
             refetchOnWindowFocus: false,
